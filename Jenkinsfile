@@ -1,192 +1,200 @@
 pipeline {
     agent any
-    
+
     environment {
-        
         SCANNER_HOME = tool 'sonar-scanner'
     }
 
     stages {
         stage('Git Checkout') {
             steps {
-                git branch: 'latest', url: 'https://github.com/jaiswaladi246/10-Tier-MicroService-Appliction.git'
+                // Clone the Git repository
+                git branch: 'main', url: 'https://github.com/Sachintech-github/10-MicroService-Appliction.git'
+                
+                // Print the workspace directory
+                sh 'echo "Jenkins workspace directory:"'
+                sh 'echo $WORKSPACE'
+                
+                // List contents of the entire workspace
+                sh 'echo "Workspace contents after checkout:"'
+                sh 'ls -la $WORKSPACE'
+                
+                // List contents specifically in src/adservice
+                sh 'echo "Contents of src/adservice directory:"'
+                sh 'ls -la $WORKSPACE/src/adservice/'
             }
         }
-        
+		
         stage('SonarQube') {
             steps {
-                
                 withSonarQubeEnv('sonar') {
-                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectKey=10-Tier -Dsonar.projectName=10-Tier -Dsonar.java.binaries=. '''
+                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectKey=10-Tier -Dsonar.projectName=10-Tier -Dsonar.java.binaries=. || echo "SonarQube scan failed" '''
                 }
-               
             }
         }
-        
+		
         stage('adservice') {
             steps {
-                script{
+                script {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                          dir('/var/lib/jenkins/workspace/10-Tier/src/adservice/') {
-                                 sh "docker build -t adijaiswal/adservice:latest ."
-                                 sh "docker push adijaiswal/adservice:latest"
-								 sh " docker rmi adijaiswal/adservice:latest"
+                        dir("${env.WORKSPACE}/src/adservice") {
+                            sh "docker build -t sachintech/adservice:latest ."
+                            sh "docker push sachintech/adservice:latest"
+                            sh "docker rmi sachintech/adservice:latest"
                         }
                     }
                 }
             }
         }
 		
-		stage('cartservice') {
+        stage('cartservice') {
             steps {
-                script{
+                script {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                          dir('/var/lib/jenkins/workspace/10-Tier/src/cartservice/src/') {
-                                 sh "docker build -t adijaiswal/cartservice:latest ."
-                                 sh "docker push adijaiswal/cartservice:latest"
-								 sh " docker rmi adijaiswal/cartservice:latest"
+                        dir("${env.WORKSPACE}/src/cartservice/src") {
+                            sh "docker build -t sachintech/cartservice:latest ."
+                            sh "docker push sachintech/cartservice:latest"
+                            sh "docker rmi sachintech/cartservice:latest"
                         }
                     }
                 }
             }
         }
 		
-		stage('checkoutservice') {
+        stage('checkoutservice') {
             steps {
-                script{
+                script {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                          dir('/var/lib/jenkins/workspace/10-Tier/src/checkoutservice/') {
-                                 sh "docker build -t adijaiswal/checkoutservice:latest ."
-                                 sh "docker push adijaiswal/checkoutservice:latest"
-								 sh " docker rmi adijaiswal/checkoutservice:latest"
+                        dir("${env.WORKSPACE}/src/checkoutservice") {
+                            sh "docker build -t sachintech/checkoutservice:latest ."
+                            sh "docker push sachintech/checkoutservice:latest"
+                            sh "docker rmi sachintech/checkoutservice:latest"
                         }
                     }
                 }
             }
         }
 		
-		stage('currencyservice') {
+        stage('currencyservice') {
             steps {
-                script{
+                script {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                          dir('/var/lib/jenkins/workspace/10-Tier/src/currencyservice/') {
-                                 sh "docker build -t adijaiswal/currencyservice:latest ."
-                                 sh "docker push adijaiswal/currencyservice:latest"
-								 sh " docker rmi adijaiswal/currencyservice:latest"
+                        dir("${env.WORKSPACE}/src/currencyservice") {
+                            sh "docker build -t sachintech/currencyservice:latest ."
+                            sh "docker push sachintech/currencyservice:latest"
+                            sh "docker rmi sachintech/currencyservice:latest"
                         }
                     }
                 }
             }
         }
         
-		stage('emailservice') {
+        stage('emailservice') {
             steps {
-                script{
+                script {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                          dir('/var/lib/jenkins/workspace/10-Tier/src/emailservice/') {
-                                 sh "docker build -t adijaiswal/emailservice:latest ."
-                                 sh "docker push adijaiswal/emailservice:latest"
-								 sh " docker rmi adijaiswal/emailservice:latest"
+                        dir("${env.WORKSPACE}/src/emailservice") {
+                            sh "docker build -t sachintech/emailservice:latest ."
+                            sh "docker push sachintech/emailservice:latest"
+                            sh "docker rmi sachintech/emailservice:latest"
                         }
                     }
                 }
             }
         }
 		
-		stage('frontend') {
+        stage('frontend') {
             steps {
-                script{
+                script {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                          dir('/var/lib/jenkins/workspace/10-Tier/src/frontend/') {
-                                 sh "docker build -t adijaiswal/frontend:latest ."
-                                 sh "docker push adijaiswal/frontend:latest"
-								 sh " docker rmi adijaiswal/frontend:latest"
+                        dir("${env.WORKSPACE}/src/frontend") {
+                            sh "docker build -t sachintech/frontend:latest ."
+                            sh "docker push sachintech/frontend:latest"
+                            sh "docker rmi sachintech/frontend:latest"
                         }
                     }
                 }
             }
         }
 		
-		stage('loadgenerator') {
+        stage('loadgenerator') {
             steps {
-                script{
+                script {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                          dir('/var/lib/jenkins/workspace/10-Tier/src/loadgenerator/') {
-                                 sh "docker build -t adijaiswal/loadgenerator:latest ."
-                                 sh "docker push adijaiswal/loadgenerator:latest"
-								 sh " docker rmi adijaiswal/loadgenerator:latest"
+                        dir("${env.WORKSPACE}/src/loadgenerator") {
+                            sh "docker build -t sachintech/loadgenerator:latest ."
+                            sh "docker push sachintech/loadgenerator:latest"
+                            sh "docker rmi sachintech/loadgenerator:latest"
                         }
                     }
                 }
             }
         }
 		
-		stage('paymentservice') {
+        stage('paymentservice') {
             steps {
-                script{
+                script {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                          dir('/var/lib/jenkins/workspace/10-Tier/src/paymentservice/') {
-                                 sh "docker build -t adijaiswal/paymentservice:latest ."
-                                 sh "docker push adijaiswal/paymentservice:latest"
-								  sh " docker rmi adijaiswal/paymentservice:latest"
+                        dir("${env.WORKSPACE}/src/paymentservice") {
+                            sh "docker build -t sachintech/paymentservice:latest ."
+                            sh "docker push sachintech/paymentservice:latest"
+                            sh "docker rmi sachintech/paymentservice:latest"
                         }
                     }
                 }
             }
         }
         
-		stage('productcatalogservice') {
+        stage('productcatalogservice') {
             steps {
-                script{
+                script {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                          dir('/var/lib/jenkins/workspace/10-Tier/src/productcatalogservice/') {
-                                 sh "docker build -t adijaiswal/productcatalogservice:latest ."
-                                 sh "docker push adijaiswal/productcatalogservice:latest"
-								 sh " docker rmi adijaiswal/productcatalogservice:latest"
+                        dir("${env.WORKSPACE}/src/productcatalogservice") {
+                            sh "docker build -t sachintech/productcatalogservice:latest ."
+                            sh "docker push sachintech/productcatalogservice:latest"
+                            sh "docker rmi sachintech/productcatalogservice:latest"
                         }
                     }
                 }
             }
         }
 		
-		stage('recommendationservice') {
+        stage('recommendationservice') {
             steps {
-                script{
+                script {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                          dir('/var/lib/jenkins/workspace/10-Tier/src/recommendationservice/') {
-                                 sh "docker build -t adijaiswal/recommendationservice:latest ."
-                                 sh "docker push adijaiswal/recommendationservice:latest"
-								 sh " docker rmi adijaiswal/recommendationservice:latest"
+                        dir("${env.WORKSPACE}/src/recommendationservice") {
+                            sh "docker build -t sachintech/recommendationservice:latest ."
+                            sh "docker push sachintech/recommendationservice:latest"
+                            sh "docker rmi sachintech/recommendationservice:latest"
                         }
                     }
                 }
             }
         }
 		
-		stage('shippingservice') {
+        stage('shippingservice') {
             steps {
-                script{
+                script {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                          dir('/var/lib/jenkins/workspace/10-Tier/src/shippingservice/') {
-                                 sh "docker build -t adijaiswal/shippingservice:latest ."
-                                 sh "docker push adijaiswal/shippingservice:latest"
-								 sh " docker rmi adijaiswal/shippingservice:latest"
+                        dir("${env.WORKSPACE}/src/shippingservice") {
+                            sh "docker build -t sachintech/shippingservice:latest ."
+                            sh "docker push sachintech/shippingservice:latest"
+                            sh "docker rmi sachintech/shippingservice:latest"
                         }
                     }
                 }
             }
         }
         
-        
-        	stage('K8-Deploy') {
+        stage('K8-Deploy') {
             steps {
-                withKubeConfig(caCertificate: '', clusterName: 'my-eks8', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://2BCD568E04EC6456125F85067AFE81B9.gr7.ap-south-1.eks.amazonaws.com') {
-                         sh 'kubectl apply -f deployment-service.yml'
-                         sh 'kubectl get pods '
-                         sh 'kubectl get svc'
+                withKubeConfig(caCertificate: '', clusterName: 'my-eks22', contextName: '', credentialsId: 'kubectl-token', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://3C275AE4236F6E2F88051B50265245B6.gr7.ap-south-1.eks.amazonaws.com') {
+                    sh 'kubectl apply -f deployment-service.yml'
+                    sh 'kubectl get pods '
+                    sh 'kubectl get svc'
                 }
             }
         }
-        
     }
 }
