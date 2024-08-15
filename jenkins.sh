@@ -1,30 +1,55 @@
-Install jenkins easy way:
+#!/bin/bash
 
-First Install Java (JDK) version that you want:
+# Function to install the selected JDK version
+install_jdk() {
+    case $1 in
+        1) sudo apt install openjdk-8-jre-headless -y ;;
+        2) sudo apt install default-jre -y ;;
+        3) sudo apt install openjdk-11-jre-headless -y ;;
+        4) sudo apt install openjdk-17-jre-headless -y ;;
+        5) sudo apt install openjdk-19-jre-headless -y ;;
+        6) sudo apt install openjdk-20-jre-headless -y ;;
+        7) sudo apt install openjdk-21-jre-headless -y ;;
+        8) sudo apt install openjdk-22-jre-headless -y ;;
+        *) echo "Invalid option selected."; exit 1 ;;
+    esac
+}
 
-sudo apt install default-jre              # version 2:1.17-75, or
-sudo apt install openjdk-17-jre-headless  # version 17.0.10~6ea-1
-sudo apt install openjdk-11-jre-headless  # version 11.0.21+9-0ubuntu1
-sudo apt install openjdk-19-jre-headless  # version 19.0.2+7-4
-sudo apt install openjdk-20-jre-headless  # version 20.0.2+9-1
-sudo apt install openjdk-21-jre-headless  # version 21.0.1+12-3
-sudo apt install openjdk-22-jre-headless  # version 22~22ea-1
-sudo apt install openjdk-8-jre-headless   # version 8u392-ga-1
+# Display JDK options
+echo "Select the JDK version to install:"
+echo "1) OpenJDK 8"
+echo "2) Default JRE"
+echo "3) OpenJDK 11"
+echo "4) OpenJDK 17"
+echo "5) OpenJDK 19"
+echo "6) OpenJDK 20"
+echo "7) OpenJDK 21"
+echo "8) OpenJDK 22"
 
-then
+# Read user choice
+read -p "Enter your choice (1-8): " jdk_choice
 
-nano jenkins.sh
+# Install the selected JDK
+install_jdk $jdk_choice
 
-sudo apt install openjdk-17-jre-headless -y
+# Install Jenkins
+echo "Installing Jenkins..."
+
 sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
   https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
 echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]" \
   https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
   /etc/apt/sources.list.d/jenkins.list > /dev/null
+
 sudo apt-get update
 sudo apt-get install jenkins -y
 
- 
+echo "Jenkins installation complete."
+
+############################################################################
+
+# Make the script executable
 sudo chmod +x jenkins.sh
 
+# Execute the script
 ./jenkins.sh
